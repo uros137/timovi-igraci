@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="sr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Timovi i Igrači</title>
+
+  <style>
+    :root{
+      --bg:#0f141b; --card:#171f2b; --line:#2a3446; --text:#e9eef4; --muted:#a9b4c6;
+      --radius:14px; --pad:16px; --gap:14px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; padding:24px;
+      background:var(--bg); color:var(--text);
+      font: 15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;
+    }
+
+    .container{max-width:1100px; margin:0 auto; display:flex; flex-direction:column; gap:20px}
+
+    h1{margin:0 0 8px 0; font-size:28px}
+    .sub{color:var(--muted); margin-bottom:8px}
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:var(--pad);
+      box-shadow:0 0 0 1px rgba(0,0,0,.04) inset;
+    }
+
+    .section-title{margin:0 0 10px 0; font-size:18px}
+
+    /* form layout */
+    .form{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:var(--gap);
+    }
+    .form .col-1{grid-column: span 1}
+    .form .col-2{grid-column: span 2}
+
+    @media (max-width: 720px){
+      .form{grid-template-columns:1fr}
+      .form .col-2{grid-column:span 1}
+    }
+
+    label{display:block; color:var(--muted); font-size:12px; margin-bottom:6px}
+    input, select, button{
+      width:100%; padding:10px 12px; border-radius:10px;
+      border:1px solid var(--line); background:#0c121a; color:var(--text);
+      outline:none;
+    }
+    input::placeholder{color:#8c97ab}
+    button{
+      background:#1f2a3b; cursor:pointer; font-weight:600; border-color:#324159;
+    }
+    button:hover{filter:brightness(1.05)}
+
+    /* tables */
+    table{width:100%; border-collapse:collapse}
+    th, td{padding:10px 12px; border-bottom:1px solid var(--line)}
+    th{color:var(--muted); font-weight:600; text-align:left}
+    td .actions{display:flex; gap:8px}
+    .btn-sm{padding:6px 10px; border-radius:8px}
+
+    /* toolbar */
+    .toolbar{
+      display:flex; align-items:center; gap:10px; margin-top:10px; flex-wrap:wrap;
+    }
+    .toolbar .grow{flex:1}
+    .right{margin-left:auto; display:flex; gap:10px; align-items:center}
+    .muted{color:var(--muted)}
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <h1>Timovi i Igrači</h1>
+    <div class="sub">Zadatak by Uroš Kašiković</div>
+  </header>
+
+  <!-- NOVI TIM -->
+  <section class="card">
+    <h2 class="section-title">Novi tim</h2>
+    <div class="form">
+      <div class="col-1">
+        <label for="team-name">Naziv tima</label>
+        <input id="team-name" placeholder="npr. Partizan" />
+      </div>
+      <div class="col-1">
+        <label for="team-city">Grad</label>
+        <input id="team-city" placeholder="npr. Beograd" />
+      </div>
+      <div class="col-2">
+        <button id="add-team" class="btn-sm">Dodaj tim</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- NOVI IGRAČ -->
+  <section class="card">
+    <h2 class="section-title">Novi igrač</h2>
+    <div class="form">
+      <div class="col-2">
+        <label for="player-name">Ime i prezime</label>
+        <input id="player-name" placeholder="npr. Neymar JR" />
+      </div>
+
+      <div class="col-1">
+        <label for="player-position">Pozicija</label>
+        <select id="player-position">
+          <option value="GK">GK</option>
+          <option value="DF">DF</option>
+          <option value="MF">MF</option>
+          <option value="FW">FW</option>
+        </select>
+      </div>
+      <div class="col-1">
+        <label for="player-age">Godine (14–60)</label>
+        <input id="player-age" type="number" min="14" max="60" placeholder="npr. 21" />
+      </div>
+
+      <div class="col-2">
+        <label for="player-team">Tim</label>
+        <select id="player-team"></select>
+      </div>
+
+      <div class="col-2">
+        <button id="add-player" class="btn-sm">Dodaj igrača</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SVI TIMOVI -->
+  <section class="card">
+    <h2 class="section-title">Svi timovi</h2>
+    <table>
+      <thead>
+      <tr>
+        <th style="width:70px">ID</th>
+        <th>Naziv</th>
+        <th>Grad</th>
+        <th style="width:180px">Akcije</th>
+      </tr>
+      </thead>
+      <tbody id="teams-list"></tbody>
+    </table>
+  </section>
+
+  <!-- IGRAČI -->
+  <section class="card">
+    <h2 class="section-title">Igrači</h2>
+
+    <!-- filteri -->
+    <div class="form" style="margin-bottom:8px">
+      <div class="col-1">
+        <label for="filter-position">Filter pozicija (npr. MF)</label>
+        <input id="filter-position" placeholder="MF / DF / GK / FW" />
+      </div>
+      <div class="col-1">
+        <label for="filter-teamid">Filter teamId (npr. 1)</label>
+        <input id="filter-teamid" type="number" min="1" placeholder="1" />
+      </div>
+
+      <div class="col-1">
+        <label for="page-input">Strana</label>
+        <input id="page-input" type="number" min="1" placeholder="1" />
+      </div>
+      <div class="col-1">
+        <label for="size-input">Veličina strane</label>
+        <input id="size-input" type="number" min="1" placeholder="10" />
+      </div>
+
+      <div class="col-2">
+        <button id="apply-filters" class="btn-sm">Primeni filtere</button>
+      </div>
+    </div>
+
+    <!-- info & paging -->
+    <div class="toolbar">
+      <span id="players-page-info" class="muted grow">Strana 1/1 • Ukupno 0</span>
+      <div class="right">
+        <button id="prev-btn" class="btn-sm">Prethodna</button>
+        <button id="next-btn" class="btn-sm">Sledeća</button>
+      </div>
+    </div>
+
+    <!-- tabela igrača -->
+    <table style="margin-top:8px">
+      <thead>
+      <tr>
+        <th style="width:70px">ID</th>
+        <th>Ime</th>
+        <th style="width:90px">God.</th>
+        <th style="width:90px">Poz.</th>
+        <th>Tim</th>
+        <th style="width:180px">Akcije</th>
+      </tr>
+      </thead>
+      <tbody id="players-list"></tbody>
+    </table>
+  </section>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
